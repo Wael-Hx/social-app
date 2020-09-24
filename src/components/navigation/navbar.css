@@ -1,0 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=Oleo+Script&family=Raleway&display=swap");
+.home {
+  font-family: "Oleo Script", cursive;
+  font-weight: 300;
+}
+.sign-in {
+  font-family: "Raleway";
+  font-size: 0.8em;
+}
+nav {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  background-color: white;
+  z-index: 2;
+  border-bottom: 1px solid silver;
+  justify-content: space-around;
+}
+.account {
+  display: flex;
+  align-items: center;
+}
+.account * {
+  padding: 0 5px;
+}
+.user-links {
+  position: absolute;
+  top: 50px;
+  width: 80px;
+  border: 1px solid silver;
+}
+.arrow_box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  background-color: white;
+  z-index: 1;
+  top: 53px;
+  position: absolute;
+  border: 1px solid silver;
+  width: 85px;
+  height: 90px;
+  border-radius: 3px;
+}
+
+.arrow_box:after,
+.arrow_box:before {
+  bottom: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.arrow_box:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-bottom-color: #ffffff;
+  border-width: 11px;
+  left: 80%;
+  margin-left: -19px;
+}
+
+.arrow_box:before {
+  border-color: transparent;
+  border-bottom-color: silver;
+  border-width: 12px;
+  left: 80%;
+  margin-left: -20px;
+}
