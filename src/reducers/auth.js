@@ -21,18 +21,20 @@ export default function (state = initialState, action) {
 
   switch (type) {
     case USER_LOADED:
+      return { ...state, authState: true, loading: false, user: payload };
     case LOGIN_SUCCESS:
     case REGISTER_SUCCESS:
-      return { ...state, authState: true, loading: false, user: payload };
+      return { ...state, authState: true, loading: false };
     case REGISTER_FAIL:
       return { ...state, loading: false, errors: payload };
     case LOGOUT:
       return { ...state, loading: false, authState: false, user: null };
     case LOGOUT_ERROR:
+      return { ...state, loading: false, authState: false, errors: payload };
     case LOGIN_FAIL:
-      return { ...state, loading: false, errors: payload };
+      return { ...state, loading: false, errors: payload, user: null };
     case AUTH_ERROR:
-      return { ...state, loading: false };
+      return { ...state, loading: false, user: null };
     default:
       return state;
   }

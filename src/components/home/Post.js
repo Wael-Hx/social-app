@@ -76,6 +76,10 @@ const Post = ({
         : likePost(postId, user.uid, user.username);
     }
   };
+  const userAction = () => {
+    handleClose();
+    deletePost(postId, fileLink);
+  };
   return (
     <article className="post">
       <div className="user-info">
@@ -99,14 +103,7 @@ const Post = ({
           >
             <MenuItem onClick={handleClose}>Go to Post</MenuItem>
             {authorId === authUser?.uid ? (
-              <MenuItem
-                onClick={() => {
-                  handleClose();
-                  deletePost(postId, fileLink);
-                }}
-              >
-                Delete
-              </MenuItem>
+              <MenuItem onClick={userAction}>Delete</MenuItem>
             ) : null}
           </Menu>
         </div>

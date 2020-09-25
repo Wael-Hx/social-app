@@ -44,6 +44,9 @@ const Navbar = ({
   }, [currentUser]);
 
   const [dropMenu, setDropMenu] = useState(false);
+  const handleLogout = () => {
+    logout(history);
+  };
 
   return (
     <>
@@ -78,7 +81,7 @@ const Navbar = ({
                       borderTop: "1px solid silver",
                       paddingTop: "5px",
                     }}
-                    onClick={() => logout(history)}
+                    onClick={handleLogout}
                   >
                     <ExitToAppOutlinedIcon fontSize="inherit" /> Sign out
                   </h2>

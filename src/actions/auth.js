@@ -18,22 +18,21 @@ export const registerUser = (
   avatar
 ) => async (dispatch) => {
   try {
-    await auth.createUserWithEmailAndPassword(email, password);
-    auth.onAuthStateChanged((authUser) => {
-      if (authUser) {
-        authUser.updateProfile({
-          displayName: username,
-          photoURL: avatar,
-        });
-        dispatch({
-          type: REGISTER_SUCCESS,
-        });
-      } else {
-        authUser = null;
-      }
-    });
-    dispatch(currentUser());
+    let newUser = await auth.createUserWithEmailAndPassword(email, password);
+
+    if (newUser) {
+      await newUser.user.updateProfile({
+        displayName: username,
+        photoURL: avatar,
+      });
+      dispatch({
+        type: REGISTER_SUCCESS,
+      });
+    } else {
+      newUser = null;
+    }
     history.push("/");
+    dispatch(currentUser());
   } catch (err) {
     dispatch({
       type: REGISTER_FAIL,
@@ -71,7 +70,6 @@ export const login = (history, email, password) => async (dispatch) => {
     dispatch({
       type: LOGIN_SUCCESS,
     });
-    dispatch(currentUser());
     history.push("/");
   } catch (err) {
     dispatch({
