@@ -19,8 +19,10 @@ import {
   likePost,
   unlikePost,
 } from "../../actions/post";
+import { Link, withRouter } from "react-router-dom";
 
 const Post = ({
+  isViewActive,
   authorId,
   comments,
   postId,
@@ -36,6 +38,7 @@ const Post = ({
   deletePost,
   likePost,
   unlikePost,
+  history,
 }) => {
   const commentStyle = {
     display: "flex",
@@ -72,44 +75,68 @@ const Post = ({
       let likeStatus = likes.some((like) => like.id === user.uid);
 
       likeStatus
-        ? unlikePost({ id: user.uid, name: user.username }, postId)
+        ? unlikePost(postId, { id: user.uid, name: user.username })
         : likePost(postId, user.uid, user.username);
     }
   };
   const userAction = () => {
     handleClose();
-    deletePost(postId, fileLink);
+    deletePost(postId, fileLink, history, isViewActive);
   };
+
+  const linkStyles = {
+    textDecoration: "none",
+    color: "inherit",
+    cursor: "pointer",
+  };
+
   return (
-    <article className="post">
-      <div className="user-info">
-        <Avatar src={avatar} alt={username} />
-        <h3>{username}</h3>
-        <div style={{ marginLeft: "auto" }}>
-          <Button
-            style={{ padding: "5px", minWidth: "fit-content" }}
-            aria-controls="simple-menu"
-            aria-haspopup="true"
-            onClick={handleClick}
+    <article className={isViewActive ? "post post-container" : "post"}>
+      <div className={isViewActive ? "post-main-view" : "post-main"}>
+        <div className="user-info">
+          <Avatar src={avatar} alt={username} />
+          <Link
+            style={linkStyles}
+            to={{
+              pathname: `/${authorId}`,
+              state: {
+                avatar: authorId === authUser?.uid ? user?.avatar : avatar,
+                username: username,
+              },
+            }}
           >
-            <MoreVertIcon />
-          </Button>
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-          >
-            <MenuItem onClick={handleClose}>Go to Post</MenuItem>
-            {authorId === authUser?.uid ? (
-              <MenuItem onClick={userAction}>Delete</MenuItem>
-            ) : null}
-          </Menu>
+            <h3>{username}</h3>
+          </Link>
+          <div style={{ marginLeft: "auto" }}>
+            <Button
+              style={{ padding: "5px", minWidth: "fit-content" }}
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleClick}
+            >
+              <MoreVertIcon />
+            </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              {!isViewActive && (
+                <Link style={linkStyles} to={`/post/${postId}`}>
+                  <MenuItem onClick={handleClose}>Go to Post</MenuItem>
+                </Link>
+              )}
+
+              {authorId === authUser?.uid ? (
+                <MenuItem onClick={userAction}>Delete</MenuItem>
+              ) : null}
+            </Menu>
+          </div>
         </div>
-      </div>
-      <img className="post-img" src={fileLink} alt="post" />
-      <h4>
+        <img className="post-img" loading="lazy" src={fileLink} alt="post" />
+
         <div className="post-actions">
           <IconButton onClick={handleLike} style={{ padding: "0" }}>
             {!authState && null}
@@ -119,42 +146,54 @@ const Post = ({
               <FavoriteBorderIcon fontSize="default" />
             )}
           </IconButton>
-          <IconButton style={{ padding: "0" }}>
-            <ChatBubbleOutlineIcon fontSize="default" />
-          </IconButton>
+          <Link style={linkStyles} to={`/post/${postId}`}>
+            <IconButton style={{ padding: "0" }}>
+              <ChatBubbleOutlineIcon fontSize="default" />
+            </IconButton>
+          </Link>
           <IconButton style={{ padding: "0" }}>
             <ShareIcon fontSize="default" />
           </IconButton>
           <span> {relativeTime(time.seconds)}</span>
         </div>
-        <strong>{username} :</strong> {title}
-      </h4>
-      {comments.map((comment, index) => (
-        <h4 style={commentStyle} key={index}>
-          <strong style={{ marginRight: "5px" }}>{comment.username}</strong>
-          {comment.text}
-          {!authState
-            ? null
-            : user?.uid === comment.id && (
-                <BackspaceOutlinedIcon
-                  fontSize="inherit"
-                  style={{
-                    cursor: "pointer",
-                    marginLeft: "auto",
-                    alignSelf: "flex-end",
-                  }}
-                  onClick={() => deleteComment(comment, postId)}
-                />
-              )}
+      </div>
+      <div
+        className={
+          isViewActive ? "comments-container-view" : "comments-container"
+        }
+      >
+        <h4 style={{ marginBottom: "10px" }}>
+          <strong>{username} :</strong> {title}
         </h4>
-      ))}
-      {authState && (
-        <Comment
-          postId={postId}
-          username={authUser?.username}
-          userId={authUser?.uid}
-        />
-      )}
+        <div>
+          {comments.map((comment, index) => (
+            <h4 style={commentStyle} key={index}>
+              <strong style={{ marginRight: "5px" }}>{comment.username}</strong>
+              {comment.text}
+              {!authState
+                ? null
+                : user?.uid === comment.id && (
+                    <BackspaceOutlinedIcon
+                      fontSize="inherit"
+                      style={{
+                        cursor: "pointer",
+                        marginLeft: "auto",
+                        alignSelf: "flex-end",
+                      }}
+                      onClick={() => deleteComment(comment, postId)}
+                    />
+                  )}
+            </h4>
+          ))}
+        </div>
+        {authState && (
+          <Comment
+            postId={postId}
+            username={authUser?.username}
+            userId={authUser?.uid}
+          />
+        )}
+      </div>
     </article>
   );
 };
@@ -175,4 +214,4 @@ export default connect(mapStateToProps, {
   deletePost,
   likePost,
   unlikePost,
-})(Post);
+})(withRouter(Post));

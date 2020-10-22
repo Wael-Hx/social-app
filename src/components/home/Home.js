@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import { getPosts } from "../../actions/post";
+import { getPostsDefault } from "../../actions/post";
 import { connect } from "react-redux";
 import Container from "@material-ui/core/Container";
 import "./home.css";
@@ -10,7 +10,14 @@ import { Avatar } from "@material-ui/core";
 import AddPhotoAlternateOutlinedIcon from "@material-ui/icons/AddPhotoAlternateOutlined";
 import { Link } from "react-router-dom";
 
-const Home = ({ getPosts, posts, loading, authUser: { authState, user } }) => {
+const Home = ({
+  getPostsDefault,
+  posts,
+  loading,
+  authUser: { authState, user },
+}) => {
+  /*
+  removed to minimize firestore db reads
   useEffect(() => {
     console.log("useeffect");
     let unsubscribe = () => {};
@@ -18,7 +25,12 @@ const Home = ({ getPosts, posts, loading, authUser: { authState, user } }) => {
       unsubscribe = func;
     });
     return () => unsubscribe();
-  }, [getPosts]);
+  }, [getPosts]); */
+
+  useEffect(() => {
+    console.log("get posts effect");
+    getPostsDefault();
+  }, [getPostsDefault]);
   if (loading) {
     return <Loading />;
   }
@@ -28,6 +40,7 @@ const Home = ({ getPosts, posts, loading, authUser: { authState, user } }) => {
     cursor: "pointer",
     marginLeft: "auto",
   };
+
   return (
     <Container disableGutters maxWidth="md">
       <main>
@@ -53,6 +66,13 @@ const Home = ({ getPosts, posts, loading, authUser: { authState, user } }) => {
         <div className="user">
           <div>
             <Avatar
+              component={user ? Link : "div"}
+              to={
+                user && {
+                  pathname: `/${user.uid}`,
+                  state: { avatar: user.avatar, username: user.username },
+                }
+              }
               style={{ width: "55px", height: "55px" }}
               alt={user?.username}
               src={user?.avatar}
@@ -79,16 +99,17 @@ const Home = ({ getPosts, posts, loading, authUser: { authState, user } }) => {
 };
 
 Home.porpTypes = {
-  getPosts: PropTypes.func.isRequired,
   posts: PropTypes.object.isRequired,
   loading: PropTypes.bool.isRequired,
   authUser: PropTypes.object.isRequired,
+  toggleView: PropTypes.bool.isRequired,
 };
 
 const mapStatetoProps = (state) => ({
-  getPosts: PropTypes.func.isRequired,
+  getPostsDefault: PropTypes.func.isRequired,
   posts: state.post.posts,
   loading: state.post.loading,
+  toggleView: state.post.toggleView,
   authUser: state.auth,
 });
-export default connect(mapStatetoProps, { getPosts })(Home);
+export default connect(mapStatetoProps, { getPostsDefault })(Home);
