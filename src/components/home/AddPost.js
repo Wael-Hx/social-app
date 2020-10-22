@@ -7,6 +7,7 @@ import SendIcon from "@material-ui/icons/Send";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import Container from "@material-ui/core/Container";
+import Chip from "@material-ui/core/Chip";
 import { connect } from "react-redux";
 import { withRouter, Link, Redirect } from "react-router-dom";
 import { uploadFile } from "../../actions/post";
@@ -42,21 +43,28 @@ const AddPost = ({
   history,
   uploadFile,
   authState,
-  upload: { uploadProgress, loading, uploadSuccess, fileUrl },
+  upload: { uploadProgress, loading, uploadSuccess, fileUrl, errors },
 }) => {
   const classes = useStyles();
   const [title, setTitle] = useState("");
+  const [customError, setError] = useState("");
   const [file, setFile] = useState(null);
   const handleUpload = () => {
-    uploadFile(
-      file.name,
-      file,
-      title.trim(),
-      authState.user.username,
-      authState.user.avatar,
-      authState.user.uid
-    );
+    if (file.size / 1024 / 1024 < 1.5) {
+      setError("");
+      uploadFile(
+        file.name,
+        file,
+        title.trim(),
+        authState.user.username,
+        authState.user.avatar,
+        authState.user.uid
+      );
+    } else {
+      setError("you are only allowed to upload images less than 1.5mb");
+    }
   };
+
   if (authState.loading) {
     return <Loading />;
   } else if (!authState.authState) {
@@ -95,7 +103,18 @@ const AddPost = ({
         ) : (
           <progress value={uploadProgress} max="100"></progress>
         )}
-
+        {(errors || customError) && (
+          <Chip
+            variant="outlined"
+            size="small"
+            label={
+              customError
+                ? customError
+                : "error cannot upload this file, try again later"
+            }
+            color="secondary"
+          />
+        )}
         <div>
           <input
             accept="image/*"
@@ -132,7 +151,6 @@ const AddPost = ({
             Upload
           </Button>
           <Link to="/" style={linkStyles}>
-            {" "}
             <Button
               style={font}
               color="primary"
