@@ -7,7 +7,7 @@
   font-family: "Raleway";
   font-size: 0.8em;
 }
-nav {
+nav:first-child {
   position: fixed;
   top: 0;
   width: 100vw;
@@ -24,7 +24,7 @@ nav {
   align-items: center;
 }
 .account * {
-  padding: 0 5px;
+  margin: 0 3px 0 5px;
 }
 .user-links {
   position: absolute;
@@ -44,6 +44,7 @@ nav {
   width: 85px;
   height: 90px;
   border-radius: 3px;
+  margin: 0 0px 0 -5px;
 }
 
 .arrow_box:after,

@@ -1,4 +1,4 @@
-import { auth } from "../firebase";
+import { auth, storage } from "../firebase";
 import {
   REGISTER_SUCCESS,
   REGISTER_FAIL,
@@ -8,23 +8,24 @@ import {
   AUTH_ERROR,
   LOGIN_SUCCESS,
   LOGIN_FAIL,
+  PROFILE_ERROR,
+  USER_DELETED,
+  AVATAR_UP,
+  AVATAR_UP_FAIL,
+  AVATAR_UP_SUCCESS,
 } from "./types";
 
-export const registerUser = (
-  history,
-  email,
-  username,
-  password,
-  avatar
-) => async (dispatch) => {
+export const registerUser = (history, email, username, password) => async (
+  dispatch
+) => {
   try {
     let newUser = await auth.createUserWithEmailAndPassword(email, password);
 
     if (newUser) {
       await newUser.user.updateProfile({
         displayName: username,
-        photoURL: avatar,
       });
+      newUser.user.sendEmailVerification();
       dispatch({
         type: REGISTER_SUCCESS,
       });
@@ -79,17 +80,73 @@ export const login = (history, email, password) => async (dispatch) => {
   }
 };
 
-export const logout = (history) => async (dispatch) => {
+export const logout = (history, redirected) => async (dispatch) => {
   try {
     await auth.signOut();
     dispatch({
       type: LOGOUT,
     });
-    history.push("/");
+    redirected ? history.push("/auth") : history.push("/");
   } catch (err) {
     dispatch({
       type: LOGOUT_ERROR,
       payload: err.message,
     });
+  }
+};
+//update user
+export const updateUser = (newAvatar, avatarName) => (dispatch) => {
+  const uploadTask = storage.ref(`avatars/${avatarName}`).put(newAvatar);
+  uploadTask.on(
+    "state_changed",
+    (snapshot) => {
+      let progress = Math.round(
+        (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+      );
+      dispatch({
+        type: AVATAR_UP,
+        payload: progress,
+      });
+    },
+    (error) => {
+      dispatch({
+        type: AVATAR_UP_FAIL,
+        payload: error,
+      });
+    },
+    () => {
+      storage
+        .ref("avatars")
+        .child(avatarName)
+        .getDownloadURL()
+        .then((url) => {
+          auth.currentUser.updateProfile({
+            photoURL: url,
+          });
+          dispatch({
+            type: AVATAR_UP_SUCCESS,
+            payload: url,
+          });
+        });
+    }
+  );
+};
+
+//delete user
+
+export const deleteAccount = (history, redirected) => async (dispatch) => {
+  try {
+    let user = auth.currentUser;
+    await user.delete();
+    dispatch({
+      type: USER_DELETED,
+    });
+    history.push("/");
+  } catch (err) {
+    dispatch({
+      type: PROFILE_ERROR,
+      payload: err.message,
+    });
+    dispatch(logout(history, redirected));
   }
 };

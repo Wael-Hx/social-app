@@ -1,6 +1,10 @@
 main {
   display: flex;
 }
+strong {
+  font-weight: 600;
+  font-family: "Segoe UI";
+}
 .posts {
   margin-top: 55px;
   display: flex;
@@ -16,7 +20,7 @@ main {
   width: 100%;
 }
 .user {
-  width: 140%;
+  width: 110%;
   height: 500px;
   display: flex;
   flex-direction: column;
@@ -62,4 +66,32 @@ h4 {
 }
 .post-actions * {
   margin: 5px;
+}
+.view-container {
+  margin-top: 135px;
+}
+.post-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+.post-main-view {
+  width: 70%;
+}
+.comments-container div {
+  max-height: 190px;
+  overflow: auto;
+}
+.comments-container-view {
+  width: 30%;
+  margin-top: 10px;
+}
+.comments-container-view div {
+  max-height: 500px;
+  overflow: auto;
+}
+@media screen and (max-width: 1000px) {
+  .post-main-view,
+  .comments-container-view {
+    width: 100%;
+  }
 }

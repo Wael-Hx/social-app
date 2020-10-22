@@ -36,10 +36,13 @@ const Navbar = ({
     textDecoration: "none",
     color: "inherit",
     cursor: "pointer",
+    padding: 0,
+    margin: 0,
   };
   const classes = useStyles();
 
   useEffect(() => {
+    console.log("this a test build");
     currentUser();
   }, [currentUser]);
 
@@ -51,7 +54,9 @@ const Navbar = ({
   return (
     <>
       <nav>
-        <h2 className="home">Instagram</h2>
+        <Link style={linkStyles} to="/">
+          <h2 className="home">Instagram </h2>
+        </Link>
         <div className="account">
           <Link to="/" style={linkStyles}>
             <HomeIcon />
@@ -68,9 +73,17 @@ const Navbar = ({
               />
               {dropMenu && (
                 <div className="arrow_box">
-                  <h2 className="sign-in" style={{ cursor: "pointer" }}>
-                    <AccountCircleOutlinedIcon fontSize="inherit" /> profile
-                  </h2>
+                  <Link
+                    to={{
+                      pathname: `/${user?.uid}`,
+                      state: { avatar: user?.avatar, username: user?.username },
+                    }}
+                    style={linkStyles}
+                  >
+                    <h2 className="sign-in" style={{ cursor: "pointer" }}>
+                      <AccountCircleOutlinedIcon fontSize="inherit" /> profile
+                    </h2>
+                  </Link>
                   <h2 className="sign-in" style={{ cursor: "pointer" }}>
                     <SettingsOutlinedIcon fontSize="inherit" /> settings
                   </h2>

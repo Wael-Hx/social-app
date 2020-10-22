@@ -26,14 +26,13 @@ const Register = ({ history, registerUser, authState }) => {
   const [formData, setFormData] = useState({
     email: "",
     username: "",
-    avatar: "",
     password: "",
   });
 
   const [customError, setError] = useState("");
 
   let { code, message } = authState.errors;
-  const { email, username, password, avatar } = formData;
+  const { email, username, password } = formData;
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
@@ -43,7 +42,7 @@ const Register = ({ history, registerUser, authState }) => {
     e.preventDefault();
     username ? setError("") : setError("a username is required");
 
-    registerUser(history, email, username, password, avatar);
+    registerUser(history, email, username, password);
   };
 
   if (authState.loading) {
@@ -65,7 +64,7 @@ const Register = ({ history, registerUser, authState }) => {
           value={username}
           name="username"
           onChange={(e) => onChange(e)}
-          label="UserName"
+          label="Name"
           type="text"
           variant="outlined"
           fullWidth
@@ -96,15 +95,6 @@ const Register = ({ history, registerUser, authState }) => {
           fullWidth
           autoComplete="off"
           required
-        />
-        <TextField
-          value={avatar}
-          name="avatar"
-          onChange={(e) => onChange(e)}
-          type="text"
-          label="avatar"
-          variant="outlined"
-          fullWidth
         />
         <div className="register-links">
           <Button
