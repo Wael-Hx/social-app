@@ -10,6 +10,7 @@ import {
   POST_DELETED,
   LIKE_POST,
   UNLIKE,
+  VIEW_POST,
 } from "./types";
 import { db, storage } from "../firebase";
 import { firestore } from "firebase/app";
@@ -60,17 +61,26 @@ export const uploadFile = (fileName, file, title, userId, userAvatar, id) => (
   );
 };
 //delete post
-export const deletePost = (postId, fileUrl) => async (dispatch) => {
+export const deletePost = (postId, fileUrl, history, isViewActive) => async (
+  dispatch
+) => {
   try {
     await Promise.all([
       db.collection("posts").doc(postId).delete(),
       storage.refFromURL(fileUrl).delete(),
     ]);
-
-    dispatch({
-      type: POST_DELETED,
-      payload: "post deleted successfully",
-    });
+    if (!isViewActive) {
+      dispatch({
+        type: POST_DELETED,
+        payload: { postId: postId, message: "post deleted successfully" },
+      });
+    } else {
+      dispatch({
+        type: POST_DELETED,
+        payload: { postId: postId, message: "post deleted successfully" },
+      });
+      history.push("/");
+    }
   } catch (err) {
     dispatch({
       type: POSTS_ERROR,
@@ -79,7 +89,7 @@ export const deletePost = (postId, fileUrl) => async (dispatch) => {
   }
 };
 
-// get posts
+// get posts realtime listener : removed to minimize db reads
 
 export const getPosts = (setUnsubscribe) => async (dispatch) => {
   try {
@@ -94,6 +104,48 @@ export const getPosts = (setUnsubscribe) => async (dispatch) => {
         dispatch({
           type: GET_POSTS,
           payload: posts,
+        });
+        setUnsubscribe(unsubscribe);
+      });
+  } catch (err) {
+    dispatch({
+      type: POSTS_ERROR,
+      payload: err.message,
+    });
+  }
+};
+// get posts simple get request
+export const getPostsDefault = () => async (dispatch) => {
+  try {
+    let posts = [];
+    let queryPosts = await db
+      .collection("posts")
+      .orderBy("timestamp", "desc")
+      .get();
+    queryPosts.docs.forEach((doc) => {
+      posts = [...posts, { ...doc.data(), postId: doc.id }];
+    });
+    dispatch({
+      type: GET_POSTS,
+      payload: posts,
+    });
+  } catch (err) {
+    dispatch({
+      type: POSTS_ERROR,
+      payload: err.message,
+    });
+  }
+};
+//go to post
+export const goToPost = (postId, setUnsubscribe) => async (dispatch) => {
+  try {
+    const unsubscribe = db
+      .collection("posts")
+      .doc(postId)
+      .onSnapshot((snapshot) => {
+        dispatch({
+          type: VIEW_POST,
+          payload: { ...snapshot.data(), postId: postId },
         });
         setUnsubscribe(unsubscribe);
       });
@@ -122,7 +174,7 @@ export const submitComment = (postId, comment, username, userId) => async (
       .update({ comments: firestore.FieldValue.arrayUnion(newComment) });
     dispatch({
       type: COMMENT_POSTED,
-      payload: comment,
+      payload: newComment,
     });
   } catch (err) {
     dispatch({
@@ -140,7 +192,7 @@ export const deleteComment = (comment, postId) => async (dispatch) => {
       .update({ comments: firestore.FieldValue.arrayRemove(comment) });
     dispatch({
       type: COMMENT_DELETED,
-      payload: "comment deleted",
+      payload: { comment, postId },
     });
   } catch (err) {
     dispatch({
@@ -159,6 +211,7 @@ export const likePost = (postId, userId, username) => async (dispatch) => {
       .update({ likes: firestore.FieldValue.arrayUnion(like) });
     dispatch({
       type: LIKE_POST,
+      payload: { postId, like },
     });
   } catch (err) {
     dispatch({
@@ -168,7 +221,7 @@ export const likePost = (postId, userId, username) => async (dispatch) => {
   }
 };
 
-export const unlikePost = (like, postId) => async (dispatch) => {
+export const unlikePost = (postId, like) => async (dispatch) => {
   try {
     await db
       .collection("posts")
@@ -178,6 +231,7 @@ export const unlikePost = (like, postId) => async (dispatch) => {
       });
     dispatch({
       type: UNLIKE,
+      payload: { postId, like },
     });
   } catch (err) {
     dispatch({
