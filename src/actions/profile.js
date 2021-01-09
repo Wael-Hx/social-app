@@ -15,7 +15,6 @@ export const getProfile = (userId) => async (dispatch) => {
     queryPosts.docs.forEach((doc) => {
       userPosts = [...userPosts, { ...doc.data(), postId: doc.id }];
     });
-    console.log(queryPosts);
     dispatch({
       type: GET_PROFILE,
       payload: {
