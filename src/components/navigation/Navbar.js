@@ -73,13 +73,7 @@ const Navbar = ({
               />
               {dropMenu && (
                 <div className="arrow_box">
-                  <Link
-                    to={{
-                      pathname: `/${user?.uid}`,
-                      state: { avatar: user?.avatar, username: user?.username },
-                    }}
-                    style={linkStyles}
-                  >
+                  <Link to={`/${user?.username}`} style={linkStyles}>
                     <h2 className="sign-in" style={{ cursor: "pointer" }}>
                       <AccountCircleOutlinedIcon fontSize="inherit" /> profile
                     </h2>
