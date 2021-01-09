@@ -85,38 +85,47 @@ const Post = ({
           <Link to={`/${username}`}>
             <h3>{username}</h3>
           </Link>
-          <div style={{ marginLeft: "auto" }}>
-            <Button
-              style={{ padding: "5px", minWidth: "fit-content" }}
-              aria-controls="simple-menu"
-              aria-haspopup="true"
-              onClick={handleClick}
-            >
-              <MoreVertIcon />
-            </Button>
-            <Menu
-              id="simple-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              {!isViewActive && (
-                <Link to={`/post/${postId}`}>
-                  <MenuItem onClick={handleClose}>Go to Post</MenuItem>
-                </Link>
-              )}
+          {authorId === authUser?.uid && (
+            <div style={{ marginLeft: "auto" }}>
+              <Button
+                style={{ padding: "5px", minWidth: "fit-content" }}
+                aria-controls="simple-menu"
+                aria-haspopup="true"
+                onClick={handleClick}
+              >
+                <MoreVertIcon />
+              </Button>
 
-              {authorId === authUser?.uid ? (
+              <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                {!isViewActive && (
+                  <Link to={`/post/${postId}`}>
+                    <MenuItem onClick={handleClose}>Go to Post</MenuItem>
+                  </Link>
+                )}
                 <MenuItem onClick={userAction}>Delete</MenuItem>
-              ) : null}
-            </Menu>
-          </div>
+              </Menu>
+            </div>
+          )}
         </div>
 
-        <Link to={`/post/${postId}`}>
+        {isViewActive ? (
           <img className="post-img" loading="lazy" src={fileLink} alt="post" />
-        </Link>
+        ) : (
+          <Link to={`/post/${postId}`}>
+            <img
+              className="post-img"
+              loading="lazy"
+              src={fileLink}
+              alt="post"
+            />
+          </Link>
+        )}
 
         <div className="post-actions">
           <IconButton onClick={handleLike} style={{ padding: "0" }}>
