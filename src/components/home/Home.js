@@ -34,12 +34,6 @@ const Home = ({
   if (loading) {
     return <Loading />;
   }
-  const linkStyles = {
-    textDecoration: "none",
-    color: "inherit",
-    cursor: "pointer",
-    marginLeft: "auto",
-  };
 
   return (
     <Container disableGutters maxWidth="md">
@@ -67,23 +61,20 @@ const Home = ({
           <div>
             <Avatar
               component={user ? Link : "div"}
-              to={
-                user && {
-                  pathname: `/${user.uid}`,
-                  state: { avatar: user.avatar, username: user.username },
-                }
-              }
+              to={`/${user?.username}`}
               style={{ width: "55px", height: "55px" }}
               alt={user?.username}
               src={user?.avatar}
             />
-            <h3> {user?.username} </h3>
+            <Link to={`/${user?.username}`}>
+              <h3> {user?.username} </h3>
+            </Link>
             {authState ? (
-              <Link style={linkStyles} to="/add">
-                <AddPhotoAlternateOutlinedIcon style={{ cursor: "pointer" }} />
+              <Link style={{ marginLeft: "auto" }} to="/add">
+                <AddPhotoAlternateOutlinedIcon className="link" />
               </Link>
             ) : (
-              <Link style={{ ...linkStyles, marginLeft: "10px" }} to="/auth">
+              <Link style={{ marginLeft: "10px" }} to="/auth">
                 <h3>Sign In</h3>
               </Link>
             )}

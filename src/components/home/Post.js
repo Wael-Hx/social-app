@@ -20,6 +20,7 @@ import {
   unlikePost,
 } from "../../actions/post";
 import { Link, withRouter } from "react-router-dom";
+import { relativeTime } from "../../helpers";
 
 const Post = ({
   isViewActive,
@@ -45,20 +46,7 @@ const Post = ({
     alignItems: "center",
     marginLeft: "7px",
   };
-  const relativeTime = (unixTime) => {
-    let currentTime = Math.round(new Date());
-    currentTime = Math.round(currentTime / 1000);
-    let relativeTime = currentTime - unixTime;
-    if (relativeTime < 3600) {
-      return `${Math.round(relativeTime / 60)} min ago`;
-    } else if (relativeTime < 86400) {
-      return `${Math.round(relativeTime / 60 / 60)} hours ago `;
-    } else if (relativeTime > 86400) {
-      return `${Math.round(relativeTime / 60 / 60 / 24)} days ago `;
-    } else {
-      return "unknown date format";
-    }
-  };
+
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
@@ -84,27 +72,17 @@ const Post = ({
     deletePost(postId, fileLink, history, isViewActive);
   };
 
-  const linkStyles = {
-    textDecoration: "none",
-    color: "inherit",
-    cursor: "pointer",
-  };
-
   return (
     <article className={isViewActive ? "post post-container" : "post"}>
       <div className={isViewActive ? "post-main-view" : "post-main"}>
         <div className="user-info">
-          <Avatar src={avatar} alt={username} />
-          <Link
-            style={linkStyles}
-            to={{
-              pathname: `/${authorId}`,
-              state: {
-                avatar: authorId === authUser?.uid ? user?.avatar : avatar,
-                username: username,
-              },
-            }}
-          >
+          <Avatar
+            component={Link}
+            to={`/${username}`}
+            src={avatar}
+            alt={username}
+          />
+          <Link to={`/${username}`}>
             <h3>{username}</h3>
           </Link>
           <div style={{ marginLeft: "auto" }}>
@@ -124,7 +102,7 @@ const Post = ({
               onClose={handleClose}
             >
               {!isViewActive && (
-                <Link style={linkStyles} to={`/post/${postId}`}>
+                <Link to={`/post/${postId}`}>
                   <MenuItem onClick={handleClose}>Go to Post</MenuItem>
                 </Link>
               )}
@@ -135,7 +113,10 @@ const Post = ({
             </Menu>
           </div>
         </div>
-        <img className="post-img" loading="lazy" src={fileLink} alt="post" />
+
+        <Link to={`/post/${postId}`}>
+          <img className="post-img" loading="lazy" src={fileLink} alt="post" />
+        </Link>
 
         <div className="post-actions">
           <IconButton onClick={handleLike} style={{ padding: "0" }}>
@@ -146,7 +127,7 @@ const Post = ({
               <FavoriteBorderIcon fontSize="default" />
             )}
           </IconButton>
-          <Link style={linkStyles} to={`/post/${postId}`}>
+          <Link to={`/post/${postId}`}>
             <IconButton style={{ padding: "0" }}>
               <ChatBubbleOutlineIcon fontSize="default" />
             </IconButton>
