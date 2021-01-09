@@ -29,8 +29,6 @@ const Register = ({ history, registerUser, authState }) => {
     password: "",
   });
 
-  const [customError, setError] = useState("");
-
   let { code, message } = authState.errors;
   const { email, username, password } = formData;
 
@@ -40,8 +38,6 @@ const Register = ({ history, registerUser, authState }) => {
 
   const submitUser = (e) => {
     e.preventDefault();
-    username ? setError("") : setError("a username is required");
-
     registerUser(history, email, username, password);
   };
 
@@ -59,20 +55,21 @@ const Register = ({ history, registerUser, authState }) => {
         autoComplete="off"
       >
         <TextField
-          error={customError ? true : false}
-          helperText={customError ? customError : false}
+          error={code.includes("username")}
+          helperText={code.includes("username") ? message : null}
           value={username}
           name="username"
           onChange={(e) => onChange(e)}
-          label="Name"
+          label="Username"
           type="text"
           variant="outlined"
           fullWidth
           required
+          autoComplete="off"
         />
         <TextField
-          error={code.includes("email") ? true : false}
-          helperText={code.includes("email") ? message : false}
+          error={code.includes("email")}
+          helperText={code.includes("email") ? message : null}
           value={email}
           name="email"
           onChange={(e) => onChange(e)}
@@ -85,8 +82,8 @@ const Register = ({ history, registerUser, authState }) => {
 
         <TextField
           value={password}
-          error={code.includes("password") ? true : false}
-          helperText={code.includes("password") ? message : false}
+          error={code.includes("password")}
+          helperText={code.includes("password") ? message : null}
           name="password"
           onChange={(e) => onChange(e)}
           type="password"
