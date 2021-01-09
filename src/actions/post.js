@@ -18,6 +18,12 @@ import { firestore } from "firebase/app";
 export const uploadFile = (fileName, file, title, userId, userAvatar, id) => (
   dispatch
 ) => {
+  if (!title) {
+    return dispatch({
+      type: UPLOAD_FAIL,
+      payload: "Add title first",
+    });
+  }
   const uploadTask = storage.ref(`files/${fileName}`).put(file);
   uploadTask.on(
     "state_changed",
@@ -42,25 +48,28 @@ export const uploadFile = (fileName, file, title, userId, userAvatar, id) => (
         .child(fileName)
         .getDownloadURL()
         .then((url) => {
-          db.collection("posts").add({
-            timestamp: firestore.FieldValue.serverTimestamp(),
-            title: title,
-            fileURL: url,
-            userId: userId,
-            id: id,
-            avatar: userAvatar,
-            comments: [],
-            likes: [],
-          });
-          dispatch({
-            type: UPLOAD_SUCCESS,
-            payload: url,
-          });
+          db.collection("posts")
+            .add({
+              timestamp: firestore.FieldValue.serverTimestamp(),
+              title: title,
+              fileURL: url,
+              userId: userId,
+              id: id,
+              avatar: userAvatar,
+              comments: [],
+              likes: [],
+            })
+            .then((doc) => {
+              dispatch({
+                type: UPLOAD_SUCCESS,
+                payload: { url, postId: doc.id },
+              });
+            });
         });
     }
   );
 };
-//delete post
+
 export const deletePost = (postId, fileUrl, history, isViewActive) => async (
   dispatch
 ) => {

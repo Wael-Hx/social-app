@@ -11,6 +11,7 @@ import {
   POST_DELETED,
   LIKE_POST,
   UNLIKE,
+  POST_LOADING,
 } from "../actions/types";
 
 const initialState = {
@@ -43,7 +44,8 @@ export default (state = initialState, { type, payload }) => {
         uploadSuccess: true,
         errors: null,
         uploadProgress: 0,
-        fileUrl: payload,
+        fileUrl: payload.url,
+        postId: payload.postId,
       };
     case GET_POSTS:
       return {
@@ -113,7 +115,11 @@ export default (state = initialState, { type, payload }) => {
       return { ...state, loading: false, errors: payload };
     case COMMENT_ERROR:
       return { ...state, errors: payload, loading: false };
-
+    case POST_LOADING:
+      return {
+        ...state,
+        viewLoading: true,
+      };
     default:
       return state;
   }

@@ -12,6 +12,7 @@ import { connect } from "react-redux";
 import { withRouter, Link, Redirect } from "react-router-dom";
 import { uploadFile } from "../../actions/post";
 import Loading from "../navigation/Loading";
+import { formatString } from "../../helpers";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,22 +29,11 @@ const font = {
   fontSize: "0.9em",
   fontFamily: "Raleway",
 };
-const linkStyles = {
-  textDecoration: "none",
-  color: "inherit",
-  cursor: "pointer",
-};
-const formatString = (s) => {
-  if (s.length > 15)
-    return `${s.substring(0, 10)}...${s.substring(s.length, s.length - 4)}`;
-  else return s;
-};
 
 const AddPost = ({
-  history,
   uploadFile,
   authState,
-  upload: { uploadProgress, loading, uploadSuccess, fileUrl, errors },
+  upload: { uploadProgress, loading, uploadSuccess, fileUrl, postId, errors },
 }) => {
   const classes = useStyles();
   const [title, setTitle] = useState("");
@@ -70,6 +60,7 @@ const AddPost = ({
   } else if (!authState.authState) {
     return <Redirect to="/" />;
   }
+
   return (
     <Container disableGutters maxWidth="sm">
       <div className="upload">
@@ -103,15 +94,17 @@ const AddPost = ({
         ) : (
           <progress value={uploadProgress} max="100"></progress>
         )}
+        <Chip
+          variant="outlined"
+          size="small"
+          label="only Admin can create posts for the moment , you can upload but files wont be saved"
+          color="primary"
+        />
         {(errors || customError) && (
           <Chip
             variant="outlined"
             size="small"
-            label={
-              customError
-                ? customError
-                : "error cannot upload this file, try again later"
-            }
+            label={errors ?? "error cannot upload this file, try again later"}
             color="secondary"
           />
         )}
@@ -145,20 +138,19 @@ const AddPost = ({
             color="primary"
             startIcon={<CloudUploadIcon />}
             variant="contained"
-            disabled={file ? false : true}
+            disabled={!file}
             onClick={handleUpload}
           >
             Upload
           </Button>
-          <Link to="/" style={linkStyles}>
+          <Link to={uploadSuccess ? `/post/${postId}` : "/"}>
             <Button
               style={font}
-              color="primary"
-              endIcon={<SendIcon />}
+              color={uploadSuccess ? "primary" : "default"}
+              endIcon={uploadSuccess && <SendIcon />}
               variant="contained"
-              disabled={uploadSuccess ? false : true}
             >
-              Post
+              {uploadSuccess ? "Post" : "cancel"}
             </Button>
           </Link>
         </div>
