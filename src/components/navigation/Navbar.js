@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
   small: {
     width: theme.spacing(4),
     height: theme.spacing(4),
+    cursor: "pointer",
   },
 }));
 
@@ -42,7 +43,6 @@ const Navbar = ({
   const classes = useStyles();
 
   useEffect(() => {
-    console.log("this a test build");
     currentUser();
   }, [currentUser]);
 
