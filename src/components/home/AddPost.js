@@ -23,6 +23,13 @@ const useStyles = makeStyles((theme) => ({
   input: {
     display: "none",
   },
+  chip: {
+    height: "fit-content",
+    padding: "5px 0",
+    "& span": {
+      whiteSpace: "pre-wrap",
+    },
+  },
 }));
 
 const font = {
@@ -99,6 +106,7 @@ const AddPost = ({
           size="small"
           label="only Admin can create posts for the moment , you can upload but files wont be saved"
           color="primary"
+          classes={{ root: classes.chip }}
         />
         {(errors || customError) && (
           <Chip
