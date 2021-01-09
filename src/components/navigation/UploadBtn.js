@@ -24,11 +24,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const UploadBtn = ({ updateUser, uploading, uploadSuccess }) => {
+const UploadBtn = ({ updateUser, uploading, uploadSuccess, username }) => {
   const [newAvatar, setAvatar] = useState(null);
   const classes = useStyles();
   const handleAvatarUpdate = () => {
-    updateUser(newAvatar, newAvatar.name);
+    updateUser(newAvatar, newAvatar.name, username);
   };
   return (
     <div className={classes.iconContainer}>
