@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { getProfile } from "../../actions/profile";
+import { getProfile, setLoading } from "../../actions/profile";
 import Loading from "../navigation/Loading";
 import Container from "@material-ui/core/Container";
 import Avatar from "@material-ui/core/Avatar";
@@ -9,26 +9,28 @@ import { Link } from "react-router-dom";
 import "./profile.css";
 import SettingsList from "../navigation/SettingsList";
 import UploadBtn from "../navigation/UploadBtn";
+import { PROFILE_LOADING } from "../../actions/types";
 
 const Profile = ({
   getProfile,
   authUser,
-  profile: { loading, profileData, updatedAvatarLink },
+  profile: { loading, profileData, userDetails },
   match,
-  location: { state },
+  setLoading,
 }) => {
   useEffect(() => {
     console.log("user profile");
     getProfile(match.params.id);
-  }, [getProfile, match.params.id]);
-  const linkStyles = {
-    textDecoration: "none",
-    color: "inherit",
-    cursor: "pointer",
-  };
+
+    return () => setLoading(PROFILE_LOADING);
+  }, [getProfile, setLoading, match.params.id]);
 
   if (loading) {
-    return <Loading />;
+    return (
+      <div className="center">
+        <Loading />
+      </div>
+    );
   }
   return (
     <Container
@@ -39,24 +41,22 @@ const Profile = ({
       <div className="profile">
         <Avatar
           style={{ width: "100px", height: "100px" }}
-          src={updatedAvatarLink ? updatedAvatarLink : state.avatar}
-          alt={state.username}
+          src={userDetails?.avatar}
+          alt={userDetails?.username}
         />
-        {authUser.user?.uid === match.params.id ? <UploadBtn /> : null}
+        {authUser.user?.uid === userDetails?.userId ? (
+          <UploadBtn username={userDetails.username} />
+        ) : null}
         <div>
-          <h2>{state.username}</h2>
-          {authUser.user?.uid === match.params.id ? <SettingsList /> : null}
+          <h2>{userDetails?.username}</h2>
+          {authUser.user?.uid === userDetails?.userId ? <SettingsList /> : null}
         </div>
       </div>
       <hr />
       <div className="gallerie">
         {profileData.map((post) => {
           return (
-            <Link
-              key={post.postId}
-              style={linkStyles}
-              to={`/post/${post.postId}`}
-            >
+            <Link key={post.postId} to={`/post/${post.postId}`}>
               <div
                 style={
                   loading
@@ -91,4 +91,4 @@ const mapStateToProps = (state) => ({
   authUser: state.auth,
   profile: state.profile,
 });
-export default connect(mapStateToProps, { getProfile })(Profile);
+export default connect(mapStateToProps, { getProfile, setLoading })(Profile);

@@ -4,10 +4,12 @@ import {
   AVATAR_UP_SUCCESS,
   AVATAR_UP_FAIL,
   AVATAR_UP,
+  PROFILE_LOADING,
 } from "../actions/types";
 
 const initialState = {
   loading: true,
+  userDetails: {},
   profileData: [],
   uploadProgress: 0,
   uploadSuccess: false,
@@ -17,11 +19,17 @@ const initialState = {
 
 export default (state = initialState, { type, payload }) => {
   switch (type) {
+    case PROFILE_LOADING:
+      return {
+        ...state,
+        loading: true,
+      };
     case GET_PROFILE:
       return {
         ...state,
         uploadSuccess: false,
-        profileData: payload,
+        userDetails: payload.profile,
+        profileData: payload.userPosts,
         loading: false,
       };
     case AVATAR_UP:
@@ -37,6 +45,7 @@ export default (state = initialState, { type, payload }) => {
         uploadProgress: 0,
         uploadSuccess: true,
         updatedAvatarLink: payload,
+        userDetails: { ...state.userDetails, avatar: payload },
         loading: false,
       };
     case AVATAR_UP_FAIL:
