@@ -4,6 +4,19 @@
 body {
   background-color: rgb(250, 250, 250);
 }
+a,
+.link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.center {
+  width: 100%;
+  height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .signin {
   width: 30%;
   margin: auto;

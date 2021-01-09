@@ -9,6 +9,7 @@ strong {
   margin-top: 55px;
   display: flex;
   flex-direction: column;
+  min-width: 70%;
 }
 .post {
   margin-top: 30px;
