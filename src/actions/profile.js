@@ -6,15 +6,22 @@ export const getProfile = (userId) => async (dispatch) => {
     let userPosts = [];
     let queryPosts = await db
       .collection("posts")
-      .where("id", "==", userId)
+      .where("userId", "==", userId)
       .orderBy("timestamp", "desc")
       .get();
+
+    let profile = await db.collection("profiles").doc(userId).get();
+
     queryPosts.docs.forEach((doc) => {
       userPosts = [...userPosts, { ...doc.data(), postId: doc.id }];
     });
+    console.log(queryPosts);
     dispatch({
       type: GET_PROFILE,
-      payload: userPosts,
+      payload: {
+        profile: profile.data(),
+        userPosts,
+      },
     });
   } catch (err) {
     dispatch({
@@ -22,4 +29,10 @@ export const getProfile = (userId) => async (dispatch) => {
       payload: err.message,
     });
   }
+};
+
+export const setLoading = (actionType) => (dispatch) => {
+  dispatch({
+    type: actionType,
+  });
 };

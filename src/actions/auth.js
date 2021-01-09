@@ -1,4 +1,4 @@
-import { auth, storage } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import {
   REGISTER_SUCCESS,
   REGISTER_FAIL,
@@ -19,13 +19,36 @@ export const registerUser = (history, email, username, password) => async (
   dispatch
 ) => {
   try {
+    if (!username) {
+      return dispatch({
+        type: REGISTER_FAIL,
+        payload: { code: "username", message: "a username is required" },
+      });
+    }
+
+    const queryUser = await db.collection("profiles").doc(username).get();
+    console.log(queryUser);
+    if (queryUser.exists) {
+      return dispatch({
+        type: REGISTER_FAIL,
+        payload: { code: "username", message: "username taken" },
+      });
+    }
+
     let newUser = await auth.createUserWithEmailAndPassword(email, password);
 
     if (newUser) {
-      await newUser.user.updateProfile({
-        displayName: username,
-      });
-      newUser.user.sendEmailVerification();
+      await Promise.all([
+        newUser.user.updateProfile({
+          displayName: username,
+        }),
+        db.collection("profiles").doc(username).set({
+          userId: newUser.user.uid,
+          avatar: "",
+          username,
+        }),
+      ]);
+      /*  newUser.user.sendEmailVerification(); */
       dispatch({
         type: REGISTER_SUCCESS,
       });
@@ -95,7 +118,7 @@ export const logout = (history, redirected) => async (dispatch) => {
   }
 };
 //update user
-export const updateUser = (newAvatar, avatarName) => (dispatch) => {
+export const updateUser = (newAvatar, avatarName, username) => (dispatch) => {
   const uploadTask = storage.ref(`avatars/${avatarName}`).put(newAvatar);
   uploadTask.on(
     "state_changed",
@@ -123,6 +146,12 @@ export const updateUser = (newAvatar, avatarName) => (dispatch) => {
           auth.currentUser.updateProfile({
             photoURL: url,
           });
+          db.collection("profiles").doc(username).set(
+            {
+              avatar: url,
+            },
+            { merge: true }
+          );
           dispatch({
             type: AVATAR_UP_SUCCESS,
             payload: url,
