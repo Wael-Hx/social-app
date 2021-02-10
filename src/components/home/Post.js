@@ -21,6 +21,7 @@ import {
 } from "../../actions/post";
 import { Link, withRouter } from "react-router-dom";
 import { relativeTime } from "../../helpers";
+import { Tooltip } from "@material-ui/core";
 
 const Post = ({
   isViewActive,
@@ -131,15 +132,34 @@ const Post = ({
           <IconButton onClick={handleLike} style={{ padding: "0" }}>
             {!authState && null}
             {likes.some((like) => like.id === user?.uid) ? (
-              <FavoriteOutlinedIcon style={{ color: "#AE1D60" }} />
+              <Tooltip
+                title={
+                  authState
+                    ? "unike this post ?"
+                    : "login required for this action"
+                }
+              >
+                <FavoriteOutlinedIcon style={{ color: "#AE1D60" }} />
+              </Tooltip>
             ) : (
-              <FavoriteBorderIcon fontSize="default" />
+              <Tooltip
+                title={
+                  authState
+                    ? "like this post ?"
+                    : "login required for this action"
+                }
+              >
+                <FavoriteBorderIcon fontSize="default" />
+              </Tooltip>
             )}
           </IconButton>
+
           <Link to={`/post/${postId}`}>
-            <IconButton style={{ padding: "0" }}>
-              <ChatBubbleOutlineIcon fontSize="default" />
-            </IconButton>
+            <Tooltip title={authState ? "comment" : "login to comment"}>
+              <IconButton style={{ padding: "0" }}>
+                <ChatBubbleOutlineIcon fontSize="default" />
+              </IconButton>
+            </Tooltip>
           </Link>
           <IconButton style={{ padding: "0" }}>
             <ShareIcon fontSize="default" />
